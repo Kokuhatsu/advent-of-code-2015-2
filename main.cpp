@@ -16,9 +16,13 @@ int main() {
     assert(input_file.is_open());
 
     std::uint32_t total_paper_required{0};
+    std::uint32_t total_ribbon_required{0};
     while(input_file.eof() == false) {
         std::string package_dimensions{};
         input_file >> package_dimensions;
+
+        if(package_dimensions.empty())
+            break;
 
         std::stringstream dimensions_stream{package_dimensions};
         std::array<std::uint32_t, 3> dimensions{0, 0, 0};
@@ -45,10 +49,17 @@ int main() {
         const auto smalest_area = *(std::min_element(wall_area.cbegin(), wall_area.cend()));
         const auto total_area = 2 * std::accumulate(wall_area.cbegin(), wall_area.cend(), 0, std::plus<std::uint32_t>());
 
+        const auto dimensions_product = std::accumulate(dimensions.cbegin(), dimensions.cend(), 1, std::multiplies<std::uint32_t>());
+        const auto dimensions_sum = std::accumulate(dimensions.cbegin(), dimensions.cend(), 0, std::plus<std::uint32_t>());
+        const auto longest_dimension = *(std::max_element(dimensions.cbegin(), dimensions.cend()));
+        const auto shortest_ribbon = (dimensions_sum - longest_dimension) * 2;
+
         total_paper_required += smalest_area + total_area;
+        total_ribbon_required += dimensions_product + shortest_ribbon;
     }
 
     std::cout << "Required paper: " << total_paper_required << std::endl;
+    std::cout << "Required ribbon: " << total_ribbon_required << std::endl;
 
     return 0;
 }
